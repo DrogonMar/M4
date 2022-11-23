@@ -19,7 +19,7 @@ impl StyleSheet for M4ButtonStyleSheet {
 
 pub struct M4InputStyleSheet {
     pub show_validity: bool,
-    pub is_valid: bool
+    pub is_valid: bool,
 }
 
 // A sleek and simple stylesheet for the text input,
@@ -51,16 +51,15 @@ impl text_input::StyleSheet for M4InputStyleSheet {
     }
 
     fn value_color(&self) -> Color {
-        return if self.show_validity{
+        return if self.show_validity {
             if self.is_valid {
                 Color::from_rgb(0., 0.6, 0.)
-            }
-            else {
+            } else {
                 Color::from_rgb(0.8, 0., 0.)
             }
-        }else{
+        } else {
             Color::BLACK
-        }
+        };
     }
 
     fn selection_color(&self) -> Color {

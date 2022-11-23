@@ -1,12 +1,12 @@
-use std::path::{Path, PathBuf};
-use iced::{Application, Column, Command, Container, Element, executor, Length, Text};
+use std::path::Path;
+use iced::{Application, Command, Container, Element, executor, Length, Text};
 use crate::{constants, fts, util};
 use crate::fts::FirstTimeSetup;
 use crate::m4_settings::{LoadError, LoadErrorType, M4Settings};
 use crate::util::{is_valid_megamix_dir, load_file_into};
 
 #[derive(PartialEq)]
-pub enum M4State{
+pub enum M4State {
     // Shows a loading screen
     LoadingScreen,
     // Shows an error screen
@@ -17,18 +17,16 @@ pub enum M4State{
     Home,
 }
 
-pub struct M4{
+pub struct M4 {
     state: M4State,
     settings: M4Settings,
     fts: FirstTimeSetup,
 }
 
-impl M4{
-    
-}
+impl M4 {}
 
 #[derive(Debug)]
-pub enum Message{
+pub enum Message {
     LoadedSettings(Result<M4Settings, LoadError>),
     FTSMessage(fts::FTSMessage),
 }
@@ -38,7 +36,7 @@ impl Application for M4 {
     type Message = Message;
     type Flags = ();
 
-    fn new(flags: Self::Flags) -> (Self, Command<Self::Message>) {
+    fn new(_flags: Self::Flags) -> (Self, Command<Self::Message>) {
         let state = M4State::LoadingScreen;
         let settings = M4Settings::default();
         (
@@ -76,7 +74,7 @@ impl Application for M4 {
                             self.state = M4State::FirstTimeSetup;
                             Command::none()
                         }
-                    }
+                    };
                 }
 
                 //If were here that means the settings file exists,
@@ -97,8 +95,7 @@ impl Application for M4 {
             Message::FTSMessage(msg) => {
                 self.fts.update(msg).map(|cmd| Message::FTSMessage(cmd))
             }
-
-        }
+        };
     }
 
     fn view(&mut self) -> Element<'_, Self::Message> {

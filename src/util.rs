@@ -29,7 +29,7 @@ pub fn get_config_path() -> Option<PathBuf> {
 }
 
 #[cfg(target_family = "wasm")]
-pub fn get_config_path() -> Option<PathBuf>{
+pub fn get_config_path() -> Option<PathBuf> {
     let mut path = PathBuf::from("settings.toml");
     Some(path)
 }
@@ -47,7 +47,7 @@ pub fn is_valid_megamix_dir(path: &Path) -> bool {
 }
 
 pub fn has_mod_loader(path: &Path) -> bool {
-    if !is_valid_megamix_dir(path){
+    if !is_valid_megamix_dir(path) {
         return false;
     }
 

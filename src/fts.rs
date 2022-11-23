@@ -1,9 +1,8 @@
-use std::future::Future;
 use std::path::Path;
-use ashpd::desktop::file_chooser::{FileChooserProxy, FileFilter, OpenFileOptions};
+use ashpd::desktop::file_chooser::{FileChooserProxy, OpenFileOptions};
 use ashpd::{WindowIdentifier, zbus};
-use iced::{alignment, Alignment, Background, button, Button, Color, Column, Command, Container, Element, Font, futures, Length, Renderer, Row, Space, Svg, Text, text_input, TextInput, Vector};
-use iced::button::{State, Style, StyleSheet};
+use iced::*;
+use iced::button::State;
 use iced::svg::Handle;
 use url::Url;
 use crate::constants;
@@ -104,8 +103,8 @@ impl FirstTimeSetup {
                 Command::none()
             }
             FTSMessage::FtsStepMsg(smsg) => self.steps.update(smsg).map(|cmd| FTSMessage::FtsStepMsg(cmd)),
-            _ => { Command::none()}
-        }
+            _ => { Command::none() }
+        };
     }
 }
 //endregion
@@ -113,35 +112,36 @@ impl FirstTimeSetup {
 //region Steps
 enum Step {
     Welcome,
-    FindGameDirectory{
+    FindGameDirectory {
         text_state: text_input::State,
         browse_btn: button::State,
-        dir: String
+        dir: String,
     },
-    End
-}
-struct Steps {
-    steps: Vec<Step>,
-    current: usize
+    End,
 }
 
-impl Steps{
+struct Steps {
+    steps: Vec<Step>,
+    current: usize,
+}
+
+impl Steps {
     fn new() -> Self {
         Self {
             steps: vec![
                 Step::Welcome,
-                Step::FindGameDirectory{
+                Step::FindGameDirectory {
                     text_state: text_input::State::new(),
                     browse_btn: button::State::new(),
-                    dir: String::new()
+                    dir: String::new(),
                 },
-                Step::End
+                Step::End,
             ],
-            current: 0
+            current: 0,
         }
     }
 
-    fn update(&mut self, msg: StepMessage)  -> Command<StepMessage> {
+    fn update(&mut self, msg: StepMessage) -> Command<StepMessage> {
         self.steps[self.current].update(msg)
     }
 
@@ -163,11 +163,12 @@ impl Steps{
 
     fn has_prev(&self) -> bool {
         self.current > 0
+            && self.steps[self.current].can_go_back()
     }
 
     fn can_continue(&self) -> bool {
         self.current + 1 < self.steps.len()
-        && self.steps[self.current].can_continue()
+            && self.steps[self.current].can_continue()
     }
 }
 
@@ -189,7 +190,7 @@ impl<'a> Step {
     fn can_continue(&self) -> bool {
         //Thins like the game directory setup should check if the given data is a
         match self {
-            Step::FindGameDirectory {dir, ..} => is_valid_megamix_dir(Path::new(dir)),
+            Step::FindGameDirectory { dir, .. } => is_valid_megamix_dir(Path::new(dir)),
             Step::End => false,
             _ => true,
         }
@@ -205,7 +206,7 @@ impl<'a> Step {
     fn view(&mut self) -> Element<StepMessage> {
         match self {
             Step::Welcome => Self::welcome(),
-            Step::FindGameDirectory{ text_state, browse_btn, dir } => Self::find_game_directory(text_state, browse_btn, dir),
+            Step::FindGameDirectory { text_state, browse_btn, dir } => Self::find_game_directory(text_state, browse_btn, dir),
             Step::End => Self::end()
         }
     }
@@ -213,7 +214,7 @@ impl<'a> Step {
     fn update(&mut self, msg: StepMessage) -> Command<StepMessage> {
         return match msg {
             StepMessage::GameDirChanged(input) => {
-                if let Step::FindGameDirectory{ dir, .. } = self {
+                if let Step::FindGameDirectory { dir, .. } = self {
                     *dir = input;
                 }
                 Command::none()
@@ -221,8 +222,7 @@ impl<'a> Step {
             StepMessage::BrowseClicked => {
                 Command::perform(Self::browse_for_dir(), StepMessage::GameDirChanged)
             }
-        }
-
+        };
     }
 
     fn welcome() -> Element<'a, StepMessage> {
@@ -245,14 +245,14 @@ impl<'a> Step {
                     .push(TextInput::new(input_state, "Game directory", dir, |s| StepMessage::GameDirChanged(s))
                         .style(M4InputStyleSheet {
                             show_validity: true,
-                            is_valid: is_valid_megamix_dir(Path::new(dir))
+                            is_valid: is_valid_megamix_dir(Path::new(dir)),
                         })
                         .padding(3).width(Length::FillPortion(2)))
                     .push(Button::new(browse_btn,
                                       Svg::new(
                                           //TODO: Make a cleaner way to do this, like per platform.
                                           Handle::from_path("/usr/share/icons/breeze/actions/16/document-open-folder.svg")
-                                      ).width(Length::Units(26)).height(Length::Units(26))
+                                      ).width(Length::Units(26)).height(Length::Units(26)),
                     )
                         .style(M4ButtonStyleSheet)
                         .on_press(StepMessage::BrowseClicked))
@@ -275,7 +275,7 @@ impl<'a> Step {
         let res = proxy.open_file(&WindowIdentifier::None, "Select the Mega Mix directory",
                                   OpenFileOptions::default()
                                       .directory(true)
-                                      .accept_label("Select")
+                                      .accept_label("Select"),
         ).await;
         if res.is_ok() {
             return Url::parse(res.unwrap().uris()[0].clone().as_str()).unwrap().to_file_path().unwrap().to_str().unwrap().to_string();
