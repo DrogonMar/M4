@@ -235,7 +235,6 @@ impl<'a> Step {
     }
 
     fn find_game_directory(input_state: &'a mut text_input::State, browse_btn: &'a mut State, dir: &mut String) -> Element<'a, StepMessage> {
-        let openfoldersvg = include_bytes!("../document-open-folder.svg");
         Column::new()
             .spacing(15)
             .padding(40)
@@ -251,7 +250,8 @@ impl<'a> Step {
                         .padding(3).width(Length::FillPortion(2)))
                     .push(Button::new(browse_btn,
                                       Svg::new(
-                                          Handle::from_memory(openfoldersvg.to_vec())
+                                          //TODO: Make a cleaner way to do this, like per platform.
+                                          Handle::from_path("/usr/share/icons/breeze/actions/16/document-open-folder.svg")
                                       ).width(Length::Units(26)).height(Length::Units(26))
                     )
                         .style(M4ButtonStyleSheet)
